@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 public class BM
 {
-    public static int Search(string text, string pattern)
+    public static bool Search(string text, string pattern)
     {
         int n = text.Length;
         int m = pattern.Length;
-        if (m == 0) return -1; // edge case: empty pattern
+        if (m == 0) return false; // edge case: empty pattern
 
         Dictionary<char, int> badChar = new Dictionary<char, int>();
 
@@ -25,9 +25,8 @@ public class BM
 
             if (j < 0)
             {
-                Console.WriteLine("Pattern occurs at shift = " + s);
                 s += (s + m < n) ? m - (badChar.ContainsKey(text[s + m]) ? badChar[text[s + m]] : -1) : 1;
-                return s;
+                return true;
             }
             else
             {
@@ -35,6 +34,7 @@ public class BM
             }
         }
 
-        return -1; // if the pattern is not found
+        return false; // if the pattern is not found
     }
 }
+

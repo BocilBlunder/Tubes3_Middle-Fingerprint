@@ -2,7 +2,7 @@ using System;
 
 public class KMP
 {
-    public static int Search(string text, string pattern)
+    public static bool Search(string text, string pattern)
     {
         int n = text.Length;
         int m = pattern.Length;
@@ -22,9 +22,8 @@ public class KMP
             }
             if (j == m)
             {
-                Console.WriteLine("Found pattern at index " + (i - j));
                 j = lps[j - 1];
-                return i-j;
+                return true;
             }
             else if (i < n && pattern[j] != text[i])
             {
@@ -35,7 +34,7 @@ public class KMP
             }
         }
 
-        return -1; // if the pattern is not found
+        return false; // if the pattern is not found
     }
 
     private static void ComputeLPSArray(string pattern, int m, int[] lps)

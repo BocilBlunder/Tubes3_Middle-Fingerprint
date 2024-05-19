@@ -1,7 +1,7 @@
-﻿<Application x:Class="FingerprintGUI.App"
+﻿<Application x:Class="MiddleFingerprintUI.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:FingerprintGUI"
+             xmlns:local="clr-namespace:MiddleFingerprintUI"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

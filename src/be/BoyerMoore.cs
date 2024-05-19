@@ -1,4 +1,3 @@
-
 public class BooyerMoore
 {
 
@@ -71,3 +70,5 @@ public class BooyerMoore
     }
 
 }
+
+

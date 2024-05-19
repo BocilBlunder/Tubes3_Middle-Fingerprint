@@ -1,5 +1,4 @@
 using System;
-
 public class StringDistance
 {
     public static int HammingDistance(string a, string b)
@@ -68,4 +67,5 @@ public class StringDistance
         return dp[a.Length, b.Length];
     }
 }
+
 
