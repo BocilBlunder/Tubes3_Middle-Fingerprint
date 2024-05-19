@@ -9,43 +9,47 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Load input fingerprint image
-        Bitmap inputFingerprint = new Bitmap("..\\..\\img\\2__F_Right_index_finger.BMP");
+        try{
+            // Load input fingerprint image
+            Bitmap inputFingerprint = new Bitmap("..\\img\\2__F_Right_index_finger.BMP");
 
-        // Segment the input image to ASCII
-        string inputAscii = ImageProcessing.SegmentToAscii(inputFingerprint, 0, 0, inputFingerprint.Width, inputFingerprint.Height);
+            // Segment the input image to ASCII
+            string inputAscii = ImageProcessing.SegmentToAscii(inputFingerprint, 0, 0, inputFingerprint.Width, inputFingerprint.Height);
 
-        // Load fingerprint images from the database
-        List<Bitmap> databaseFingerprints = LoadFingerprintsFromDatabase();
+            // Load fingerprint images from the database
+            List<Bitmap> databaseFingerprints = LoadFingerprintsFromDatabase();
 
-        // Convert database images to ASCII
-        List<string> databaseAscii = new List<string>();
-        foreach (var bmp in databaseFingerprints)
-        {
-            string ascii = ImageProcessing.SegmentToAscii(bmp, 0, 0, bmp.Width, bmp.Height);
-            databaseAscii.Add(ascii);
-        }
-
-        // Search for a match using KMP and Boyer-Moore algorithms
-        bool matchFound = false;
-        for (int i = 0; i < databaseAscii.Count; i++)
-        {
-            if (KMP.Search(databaseAscii[i], inputAscii) != -1)
+            // Convert database images to ASCII
+            List<string> databaseAscii = new List<string>();
+            foreach (var bmp in databaseFingerprints)
             {
-                Console.WriteLine($"KMP: Match found in fingerprint {i + 1}");
-                matchFound = true;
+                string ascii = ImageProcessing.SegmentToAscii(bmp, 0, 0, bmp.Width, bmp.Height);
+                databaseAscii.Add(ascii);
             }
 
-            if (BM.Search(databaseAscii[i], inputAscii) != -1)
+            // Search for a match using KMP and Boyer-Moore algorithms
+            bool matchFound = false;
+            for (int i = 0; i < databaseAscii.Count; i++)
             {
-                Console.WriteLine($"BM: Match found in fingerprint {i + 1}");
-                matchFound = true;
-            }
-        }
+                if (KMP.Search(databaseAscii[i], inputAscii) != -1)
+                {
+                    Console.WriteLine($"KMP: Match found in fingerprint {i + 1}");
+                    matchFound = true;
+                }
 
-        if (!matchFound)
-        {
-            Console.WriteLine("No match found.");
+                if (BM.Search(databaseAscii[i], inputAscii) != -1)
+                {
+                    Console.WriteLine($"BM: Match found in fingerprint {i + 1}");
+                    matchFound = true;
+                }
+            }
+
+            if (!matchFound)
+            {
+                Console.WriteLine("No match found.");
+            }
+        } catch (Exception e){
+            Console.WriteLine(e.Message);
         }
     }
 
