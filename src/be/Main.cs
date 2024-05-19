@@ -11,7 +11,7 @@ class Program
     {
         try{
             // Load input fingerprint image
-            Bitmap inputFingerprint = new Bitmap("..\\img\\2__F_Right_index_finger.BMP");
+            Bitmap inputFingerprint = new Bitmap("..\\..\\test\\2__F_Right_index_finger.BMP");
 
             // Segment the input image to ASCII
             string inputAscii = ImageProcessing.SegmentToAscii(inputFingerprint, 0, 0, inputFingerprint.Width, inputFingerprint.Height);
