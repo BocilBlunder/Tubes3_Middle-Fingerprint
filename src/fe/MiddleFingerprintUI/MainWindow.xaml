@@ -6,9 +6,12 @@
         xmlns:local="clr-namespace:MiddleFingerprintUI"
         mc:Ignorable="d"
         Title="MainWindow"
-        Height="800" Width="1200"
-        >
-    <Grid Background="black">
+        Height="800" Width="1200">
+    <Grid x:Name="mainGrid" Background="black">
+        <Grid.Effect>
+            <BlurEffect x:Name="mainGridBlur" Radius="0"/>
+        </Grid.Effect>
+
         <Grid.RowDefinitions>
             <RowDefinition Height="28*"/>
             <RowDefinition Height="201*"/>
@@ -16,8 +19,8 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
-
         </Grid.ColumnDefinitions>
+
         <Border HorizontalAlignment="Left" VerticalAlignment="Top" Height="420" Width="330"
         CornerRadius="20" BorderThickness="5" Background="#00ff6f" Grid.Row="1" Margin="113,108,0,0">
             <Image x:Name="imageUpload" Stretch="Uniform"/>
@@ -31,18 +34,17 @@
                Background="LightGray"
                BorderThickness="0"
                Padding="10"
-               Margin="198,581,242,47" Click="handle_upload" Grid.ColumnSpan="1" FontSize="16" FontWeight="Bold" Grid.Row="1" Width="160" Height="60">
-
+               Margin="198,581,242,47" Click="handle_upload" Grid.ColumnSpan="1" FontSize="20" FontWeight="Bold" Grid.Row="1" Width="160" Height="60">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="10"/>
                 </Style>
             </Button.Resources>
-
         </Button>
-        <Label Content="Upload A Fingerprint Image" HorizontalAlignment="Left" Margin="88,27,0,0" VerticalAlignment="Top" Background="{x:Null}" FontFamily="Century Gothic" Foreground="White" FontSize="28" FontWeight="Bold" Height="55" Width="380" Grid.Row="1"/>
 
-        <ToggleButton x:Name="algorithmToggle" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="146" Height="59" IsChecked="False" Checked="AlgorithmToggle_Checked" Unchecked="AlgorithmToggle_Unchecked" Margin="526,200,0,0" RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="2">
+        <Label Content="Upload A Fingerprint Image" HorizontalAlignment="Left" Margin="88,29,0,0" VerticalAlignment="Top" Background="{x:Null}" FontFamily="Century Gothic" Foreground="White" FontSize="28" FontWeight="Bold" Height="55" Width="387" Grid.Row="1"/>
+
+        <ToggleButton x:Name="algorithmToggle" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="146" Height="59" IsChecked="False" Checked="AlgorithmToggle_Checked" Unchecked="AlgorithmToggle_Unchecked" Margin="526,198,0,0" RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="2">
             <ToggleButton.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -87,24 +89,26 @@
         CornerRadius="20" BorderThickness="5" Background="#00ff6f" Grid.Row="1" Margin="157,109,0,0" Grid.Column="1">
             <Image x:Name="imageResult" Stretch="Uniform"/>
         </Border>
-        <Label Content="Fingerprint Match" HorizontalAlignment="Left" Margin="200,27,0,0" VerticalAlignment="Top" Background="{x:Null}" FontFamily="Century Gothic" Foreground="White" FontSize="28" FontWeight="Bold" Height="56" Width="244" Grid.Column="1" Grid.Row="1" RenderTransformOrigin="0.59,0.834"/>
-        <Label Content="MiddleFingerprint" HorizontalAlignment="Left" Margin="431,20,0,0" VerticalAlignment="Top" Background="{x:Null}" FontFamily="Century Gothic" Foreground="White" FontSize="36" FontWeight="Bold" Height="65" Width="314" Grid.ColumnSpan="2"/>
+
+        <Label Content="Fingerprint Match" HorizontalAlignment="Left" Margin="200,29,0,0" VerticalAlignment="Top" Background="{x:Null}" FontFamily="Century Gothic" Foreground="White" FontSize="28" FontWeight="Bold" Height="56" Width="244" Grid.Column="1" Grid.Row="1" RenderTransformOrigin="0.59,0.834"/>
+
+        <Label Content="MiddleFingerprint" HorizontalAlignment="Left" Margin="443,31,0,0" VerticalAlignment="Top" Background="{x:Null}" FontFamily="Century Gothic" Foreground="White" FontSize="36" FontWeight="Bold" Height="65" Width="314" Grid.ColumnSpan="2" Grid.RowSpan="2"/>
+
         <Button  
             x:Name="searchButton"
             Content="Search"
             FontFamily="Century Gothic"
-            Foreground="White"
-            Background="#1ABC9C"
+            Foreground="Black"
+            Background="White"
             BorderThickness="0"
-            Padding="10" Grid.ColumnSpan="2" FontSize="16" FontWeight="Bold" Grid.Row="1" Click="handle_search" Width="100" Height="100" Margin="550,304,550,284">
-
+            Padding="10" Grid.ColumnSpan="2" FontSize="16" FontWeight="Bold" Grid.Row="1" Click="handle_search" Margin="530,298,530,250" Width="140" Height="140">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="100"/>
                 </Style>
             </Button.Resources>
-
         </Button>
+
         <Button Content="X" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30"
                 Foreground="White" Background="#E74C3C" FontWeight="Bold" FontSize="16"
                 Click="ExitButton_Click" BorderThickness="0" Cursor="Hand" Grid.Column="2" Margin="0,10,10,0"/>
@@ -117,25 +121,31 @@
             Background="LightGray"
             BorderThickness="0"
             Padding="10"
-            Margin="242,581,198,47" Grid.ColumnSpan="1" FontSize="16" FontWeight="Bold" Grid.Row="1" Click="handle_search" Grid.Column="1" Width="160" Height="60">
-
+            Margin="242,581,198,47" Grid.ColumnSpan="1" FontSize="22" FontWeight="Bold" Grid.Row="1" Click="Popup_Click" Grid.Column="1" Width="160" Height="60">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="10"/>
                 </Style>
             </Button.Resources>
-
         </Button>
 
-        <Button Content="Open Popup" HorizontalAlignment="Left" Margin="10" VerticalAlignment="Top" Width="100" Click="Button_Click"/>
-        <Popup Name="MyPopup" Placement="Center" Width="200" Height="100">
-            <Border Background="LightBlue" BorderBrush="Black" BorderThickness="1">
-                <StackPanel>
-                    <TextBlock Text="This is a popup" Margin="10" />
-                    <Button Content="Close" Click="ClosePopup_Click"/>
-                </StackPanel>
+        <Popup Name="MyPopup" Placement="Center" Width="700" Height="600" Opened="MyPopup_Opened" Closed="MyPopup_Closed">
+            <Border Background="White" BorderBrush="Black" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Button Content="X" HorizontalAlignment="Right" VerticalAlignment="Top" Width="30" Height="30" Foreground="White" Background="#E74C3C" FontWeight="Bold" FontSize="16" Click="ClosePopup_Click"/>
+                    <StackPanel Grid.Row="1" Margin="10">
+                        <Label Content="BIODATA" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Background="{x:Null}" FontFamily="Century Gothic" Foreground="Black" FontSize="28" FontWeight="Bold"/>
+                        <Border HorizontalAlignment="Center" VerticalAlignment="Center" Height="450" Width="400"
+                            CornerRadius="20" BorderThickness="5" Background="#00ff6f" Grid.Row="1" Margin="0,30,0,0">
+                            <TextBox x:Name="Info_Biodata" Width="350" Height="400" Margin="10" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Background="Transparent" FontSize="20" BorderBrush="Transparent"/>
+                        </Border>
+                    </StackPanel>
+                </Grid>
             </Border>
         </Popup>
     </Grid>
 </Window>
-

@@ -99,13 +99,10 @@ public class DatabaseManager
             {
                 while (reader.Read())
                 {
-                    string rowData = "";
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        rowData += reader.GetName(i) + ": " + reader[i].ToString() + ", ";
+                        biodata.Add(reader.GetName(i) + ": " + reader[i].ToString());
                     }
-                    rowData = rowData.TrimEnd(',', ' ');
-                    biodata.Add(rowData);
                 }
             }
             conn.Close();

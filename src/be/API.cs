@@ -34,7 +34,6 @@ public class API
             if(databaseAscii.Count != 0){
                 Console.WriteLine(databaseAscii.Count);
             }
-
             // Search for a match using KMP and Boyer-Moore algorithms
             bool matchFound = false;
             int j = 0;
@@ -63,13 +62,9 @@ public class API
 
             if (!matchFound)
             {
-                int x = 0;
-                Console.WriteLine("Tet");
                 List<int> dist = new List<int>();
                 foreach (string ascii in databaseAscii)
                 {
-                    x += 1;
-                    Console.WriteLine(x);
                     dist.Add(StringDistance.LevenshteinDistance(ascii, inputAscii));
                 }
                 int i = dist.IndexOf(dist.Min());

@@ -70,13 +70,7 @@ namespace MiddleFingerprintUI
             if (result.image != null)
             {
                 imageResult.Source = BitmapToImageSource(result.image);
-                List<string> biodata = API.getOwnerBiodata(result.nama);
-                string b = "";
-                foreach (string s in biodata){
-                    b += s + '\n';
-                }
-                MessageBox.Show(b);
-
+                Show_Biodata(API.getOwnerBiodata(result.nama));
             }
             else
             {
@@ -125,7 +119,17 @@ namespace MiddleFingerprintUI
                 _isToggled = false;
             }
         }
-        private void Button_Click(object sender, RoutedEventArgs e)
+
+        private void Show_Biodata(List<string> biodata)
+        {
+            Info_Biodata.Clear();
+            foreach (string info in biodata)
+            {
+                Info_Biodata.AppendText(info + "\n");
+            }
+        }
+
+        private void Popup_Click(object sender, RoutedEventArgs e)
         {
             MyPopup.IsOpen = true;  // Opens the Popup
         }
@@ -133,6 +137,16 @@ namespace MiddleFingerprintUI
         private void ClosePopup_Click(object sender, RoutedEventArgs e)
         {
             MyPopup.IsOpen = false; // Closes the Popup
+        }
+
+        private void MyPopup_Opened(object sender, EventArgs e)
+        {
+            mainGridBlur.Radius = 10; // Set to desired blur intensity
+        }
+
+        private void MyPopup_Closed(object sender, EventArgs e)
+        {
+            mainGridBlur.Radius = 0;
         }
     }
 }
