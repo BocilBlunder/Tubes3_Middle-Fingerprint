@@ -1,6 +1,7 @@
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 public class DatabaseManager
 {
@@ -56,10 +57,10 @@ public class DatabaseManager
     }
 
 
-    public List<string> getAllPath()
+    public List<FingerprintOwner> getImageFromDB()
     {
-        List<string> paths = new List<string>();
-        string query = "SELECT berkas_citra FROM sidik_jari";
+        List<FingerprintOwner> FingerprintOwners = new List<FingerprintOwner>();
+        string query = "SELECT nama, berkas_citra FROM sidik_jari";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
         {
@@ -70,12 +71,16 @@ public class DatabaseManager
             {
                 while (reader.Read())
                 {
-                    paths.Add(reader["berkas_citra"].ToString());
+                    string imageData = "..\\..\\..\\..\\..\\..\\" + (string)reader["berkas_citra"];
+                    // ..\\..\\..\\..\\..\\..\\
+                    Bitmap bmp = new Bitmap(imageData);
+                    FingerprintOwner Fingerprint = new FingerprintOwner(bmp, imageData, (string)reader["nama"]);
+                    FingerprintOwners.Add(Fingerprint);
                 }
             }
             conn.Close();
         }
-        return paths;
+        return FingerprintOwners;
     }
 
     public List<string> getBiodata(string alayname)
