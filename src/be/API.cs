@@ -11,15 +11,15 @@ using MySql.Data.MySqlClient;
 public class API
 {
    private static DatabaseManager dbController;
-    public static FingerprintOwner SearchFingerprint(Bitmap b, bool isBM)
+    public static Tuple<FingerprintOwner, double> SearchFingerprint(Bitmap b, bool isBM)
     {
-        dbController = new DatabaseManager("localhost", "tubes3", "root", "root");
+        dbController = new DatabaseManager("localhost", "tubes3", "root", "");
         try
         {
             // Load input fingerprint image
             Bitmap inputFingerprint = b;
             // Segment the input image to ASCII
-            string inputAscii = ImageProcessing.SegmentToAscii(inputFingerprint, 0, 0, inputFingerprint.Width, inputFingerprint.Height);
+            string inputAscii = ImageProcessing.ReadBestPixelFromImage(inputFingerprint, 64);
             // Load fingerprint images from the database
             List<FingerprintOwner> databaseOwner = dbController.getImageFromDB();
 
@@ -27,7 +27,7 @@ public class API
             List<string> databaseAscii = new List<string>();
             foreach (var owner in databaseOwner)
             {
-                string ascii = ImageProcessing.SegmentToAscii(owner.image, 0, 0, owner.image.Width, owner.image.Height);
+                string ascii = ImageProcessing.ImageToAscii(owner.image, 0, 0, owner.image.Width, owner.image.Height);
                 databaseAscii.Add(ascii);
             }
             
@@ -57,7 +57,7 @@ public class API
             }
 
             if(matchFound){
-                return databaseOwner[j];
+                return new Tuple<FingerprintOwner, double>(databaseOwner[j], 100);
             }
 
             if (!matchFound)
@@ -68,21 +68,21 @@ public class API
                     dist.Add(StringDistance.LevenshteinDistance(ascii, inputAscii));
                 }
                 int i = dist.IndexOf(dist.Min());
-                double percentage = StringDistance.CalculateSimilarityPercentage(inputAscii, databaseAscii[i]);
+                double percentage = StringDistance.CalculateSimilarityPercentage(inputAscii, databaseAscii[i])*100;
                 if (percentage > 0)
                 {
-                    return databaseOwner[i];
+                    return new Tuple<FingerprintOwner, double>(databaseOwner[j], percentage);
                 }
 
 
                 Console.WriteLine("No match found.");
-                return new FingerprintOwner(null, "", "");
+                return new Tuple<FingerprintOwner, double>(new FingerprintOwner(null, "", ""), percentage);
             }
         } catch (Exception e){
             Console.WriteLine(e.Message);
-            return new FingerprintOwner(null, "", ""); ;
+            return new Tuple<FingerprintOwner, double>(new FingerprintOwner(null, "", ""), 0); ;
         }    
-        return new FingerprintOwner(null, "", "");
+        return new Tuple<FingerprintOwner, double>(new FingerprintOwner(null, "", ""), 0);
     }
 
 
@@ -93,7 +93,7 @@ public class API
             Bitmap inputFingerprint = new Bitmap("..\\..\\test\\1__M_Left_index_finger.BMP");
             Console.WriteLine("TES");
             // Segment the input image to ASCII
-            string inputAscii = ImageProcessing.SegmentToAscii(inputFingerprint, 0, 0, inputFingerprint.Width, inputFingerprint.Height);
+            string inputAscii = ImageProcessing.ImageToAscii(inputFingerprint, 0, 0, inputFingerprint.Width, inputFingerprint.Height);
             Console.WriteLine("TES1");
             // Load fingerprint images from the database
             List<FingerprintOwner> databaseOwner = dbController.getImageFromDB();
@@ -102,7 +102,7 @@ public class API
             List<string> databaseAscii = new List<string>();
             foreach (var owner in databaseOwner)
             {
-                string ascii = ImageProcessing.SegmentToAscii(owner.image, 0, 0, owner.image.Width, owner.image.Height);
+                string ascii = ImageProcessing.ImageToAscii(owner.image, 0, 0, owner.image.Width, owner.image.Height);
                 databaseAscii.Add(ascii);
             }
             

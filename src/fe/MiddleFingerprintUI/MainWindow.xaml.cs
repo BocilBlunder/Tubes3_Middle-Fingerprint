@@ -10,6 +10,7 @@ using System.Windows.Media.Imaging;
 using MySql.Data.MySqlClient;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Diagnostics;
 
 namespace MiddleFingerprintUI
 {
@@ -64,9 +65,9 @@ namespace MiddleFingerprintUI
 
         private void handle_search(object sender, RoutedEventArgs e)
         {
-            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-
-            FingerprintOwner result = API.SearchFingerprint(inputFingerprint, !_isToggled);
+            Stopwatch time = new Stopwatch();
+            time.Start();
+            (FingerprintOwner result, double percentage) = API.SearchFingerprint(inputFingerprint, !_isToggled);
             if (result.image != null)
             {
                 imageResult.Source = BitmapToImageSource(result.image);
@@ -76,6 +77,9 @@ namespace MiddleFingerprintUI
             {
                 MessageBox.Show("No match found.");
             }
+            time.Stop();
+            Time.Text = $"Processing Time: {time.ElapsedMilliseconds} ms";
+            Percentage.Text = $"Similarity: {percentage:0.00}%";
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)

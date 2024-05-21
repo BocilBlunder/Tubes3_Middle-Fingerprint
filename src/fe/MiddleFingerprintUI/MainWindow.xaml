@@ -44,7 +44,7 @@
 
         <Label Content="Upload A Fingerprint Image" HorizontalAlignment="Left" Margin="88,29,0,0" VerticalAlignment="Top" Background="{x:Null}" FontFamily="Century Gothic" Foreground="White" FontSize="28" FontWeight="Bold" Height="55" Width="387" Grid.Row="1"/>
 
-        <ToggleButton x:Name="algorithmToggle" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="146" Height="59" IsChecked="False" Checked="AlgorithmToggle_Checked" Unchecked="AlgorithmToggle_Unchecked" Margin="526,198,0,0" RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="2">
+        <ToggleButton x:Name="algorithmToggle" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="146" Height="59" IsChecked="False" Checked="AlgorithmToggle_Checked" Unchecked="AlgorithmToggle_Unchecked" Margin="526,183,0,0" RenderTransformOrigin="0.5,0.5" Grid.ColumnSpan="2">
             <ToggleButton.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -101,7 +101,7 @@
             Foreground="Black"
             Background="White"
             BorderThickness="0"
-            Padding="10" Grid.ColumnSpan="2" FontSize="16" FontWeight="Bold" Grid.Row="1" Click="handle_search" Margin="530,298,530,250" Width="140" Height="140">
+            Padding="10" Grid.ColumnSpan="2" FontSize="24" FontWeight="Bold" Grid.Row="1" Click="handle_search" Margin="530,283,530,265" Width="140" Height="140">
             <Button.Resources>
                 <Style TargetType="{x:Type Border}">
                     <Setter Property="CornerRadius" Value="100"/>
@@ -147,5 +147,7 @@
                 </Grid>
             </Border>
         </Popup>
+        <TextBox x:Name="Percentage" TextWrapping="Wrap" Text="" Margin="524,524,524,143" Grid.Row="1" FontFamily="Century Gothic" Foreground="White" Background="{x:Null}" Grid.ColumnSpan="2" BorderBrush="{x:Null}" FontSize="16" TextAlignment="Center"/>
+        <TextBox x:Name="Time" TextWrapping="Wrap" Text="" Margin="477,564,477,103" Grid.Row="1" FontFamily="Century Gothic" Foreground="White" Background="{x:Null}" Grid.ColumnSpan="2" BorderBrush="{x:Null}" FontSize="16" TextAlignment="Center"/>
     </Grid>
 </Window>
