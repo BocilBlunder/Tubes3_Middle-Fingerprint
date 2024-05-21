@@ -67,7 +67,8 @@ namespace MiddleFingerprintUI
         {
             Stopwatch time = new Stopwatch();
             time.Start();
-            (FingerprintOwner result, double percentage) = API.SearchFingerprint(inputFingerprint, !_isToggled);
+            imageResult.Source = null;
+;            (FingerprintOwner result, double percentage) = API.SearchFingerprint(inputFingerprint, !_isToggled);
             if (result.image != null)
             {
                 imageResult.Source = BitmapToImageSource(result.image);

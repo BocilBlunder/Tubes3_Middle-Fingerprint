@@ -62,16 +62,18 @@ public class API
 
             if (!matchFound)
             {
+
+                string newinputAscii = ImageProcessing.ImageToAscii(b, 0, 0, b.Width, b.Height);
                 List<int> dist = new List<int>();
                 foreach (string ascii in databaseAscii)
                 {
-                    dist.Add(StringDistance.LevenshteinDistance(ascii, inputAscii));
+                    dist.Add(StringDistance.LevenshteinDistance(ascii, newinputAscii));
                 }
-                int i = dist.IndexOf(dist.Min());
-                double percentage = StringDistance.CalculateSimilarityPercentage(inputAscii, databaseAscii[i])*100;
+                int x = dist.IndexOf(dist.Min());
+                double percentage = StringDistance.CalculateSimilarityPercentage(newinputAscii, databaseAscii[x]);
                 if (percentage > 0)
                 {
-                    return new Tuple<FingerprintOwner, double>(databaseOwner[j], percentage);
+                    return new Tuple<FingerprintOwner, double>(databaseOwner[x], percentage);
                 }
 
 
