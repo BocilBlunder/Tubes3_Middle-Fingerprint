@@ -12,7 +12,7 @@ public class ImageProcessing {
         for (int j = startX; j < startX + width && j < bmp.Width; j++)
         {
             Color pixel = bmp.GetPixel(j, i);
-            int value = (pixel.R + pixel.G + pixel.B) / 3 > 128 ? 0 : 1;
+            int value = (pixel.R * 0.3 + pixel.G * 0.59 + pixel.B * 0.11) > 128 ? 0 : 1;
             binaryStringBuilder.Append(value);
         }
     }

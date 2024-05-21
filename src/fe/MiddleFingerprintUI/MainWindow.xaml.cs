@@ -24,9 +24,9 @@ namespace MiddleFingerprintUI
         public MainWindow()
         {
             InitializeComponent();
-            this.WindowState = WindowState.Maximized; // Maximize window
             this.WindowStyle = WindowStyle.None; // Remove window border and title bar
             this.ResizeMode = ResizeMode.NoResize; // Disable resizing
+            this.WindowStartupLocation = WindowStartupLocation.CenterScreen; // Open window in the center of the screen
         }
 
         private void handle_upload(object sender, RoutedEventArgs e)
@@ -62,30 +62,15 @@ namespace MiddleFingerprintUI
             }
         }
 
-        private void ToggleSwitch(object sender, MouseButtonEventArgs e)
-        {
-            _isToggled = !_isToggled; // Toggle the state
-            AnimateToggle();
-        }
-
-        private void AnimateToggle()
-        {
-            double targetX = _isToggled ? 36 : 0; // Move to right if toggled on
-            var animation = new DoubleAnimation(targetX, TimeSpan.FromSeconds(0.2));
-            sliderTransform.BeginAnimation(TranslateTransform.XProperty, animation);
-
-            toggleBackgroundOn.Visibility = _isToggled ? Visibility.Visible : Visibility.Collapsed;
-            textKMP.Visibility = _isToggled ? Visibility.Visible : Visibility.Collapsed;
-            textBM.Visibility = _isToggled ? Visibility.Collapsed : Visibility.Visible;
-        }
-
         private void handle_search(object sender, RoutedEventArgs e)
         {
             string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            Bitmap result = API.SearchFingerprint(inputFingerprint, _isToggled);
-            if (result != null)
+
+            FingerprintOwner result = API.SearchFingerprint(inputFingerprint, !_isToggled);
+            if (result.image != null)
             {
-                imageResult.Source = BitmapToImageSource(result);
+                imageResult.Source = BitmapToImageSource(result.image);
+                Show_Biodata(API.getOwnerBiodata(result.nama));
             }
             else
             {
@@ -111,6 +96,57 @@ namespace MiddleFingerprintUI
                 bitmapImage.EndInit();
                 return bitmapImage;
             }
+        }
+
+        private void AlgorithmToggle_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateAlgorithm();
+        }
+
+        private void AlgorithmToggle_Unchecked(object sender, RoutedEventArgs e)
+        {
+            UpdateAlgorithm();
+        }
+
+        private void UpdateAlgorithm()
+        {
+            if (algorithmToggle.IsChecked == true)
+            {
+                _isToggled = true;
+            }
+            else
+            {
+                _isToggled = false;
+            }
+        }
+
+        private void Show_Biodata(List<string> biodata)
+        {
+            Info_Biodata.Clear();
+            foreach (string info in biodata)
+            {
+                Info_Biodata.AppendText(info + "\n");
+            }
+        }
+
+        private void Popup_Click(object sender, RoutedEventArgs e)
+        {
+            MyPopup.IsOpen = true;  // Opens the Popup
+        }
+
+        private void ClosePopup_Click(object sender, RoutedEventArgs e)
+        {
+            MyPopup.IsOpen = false; // Closes the Popup
+        }
+
+        private void MyPopup_Opened(object sender, EventArgs e)
+        {
+            mainGridBlur.Radius = 10; // Set to desired blur intensity
+        }
+
+        private void MyPopup_Closed(object sender, EventArgs e)
+        {
+            mainGridBlur.Radius = 0;
         }
     }
 }

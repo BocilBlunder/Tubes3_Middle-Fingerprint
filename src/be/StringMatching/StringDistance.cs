@@ -66,6 +66,13 @@ public class StringDistance
         }
         return dp[a.Length, b.Length];
     }
+
+    public static double CalculateSimilarityPercentage(string a, string b)
+    {
+        int distance = LevenshteinDistance(a, b);
+        int maxLen = Math.Max(a.Length, b.Length);
+        return maxLen == 0 ? 100.0 : (1.0 - (double)distance / maxLen) * 100.0;
+    }
 }
 
 
