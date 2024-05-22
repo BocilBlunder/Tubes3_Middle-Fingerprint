@@ -57,31 +57,35 @@ public class DatabaseManager
     }
 
 
-    public List<FingerprintOwner> getImageFromDB()
+public List<FingerprintOwner> getImageFromDB()
+{
+    List<FingerprintOwner> FingerprintOwners = new List<FingerprintOwner>();
+    string query = "SELECT nama, berkas_citra FROM sidik_jari";
+
+    using (MySqlConnection conn = new MySqlConnection(connectionString))
     {
-        List<FingerprintOwner> FingerprintOwners = new List<FingerprintOwner>();
-        string query = "SELECT nama, berkas_citra FROM sidik_jari";
+        conn.Open();
+        MySqlCommand cmd = new MySqlCommand(query, conn);
 
-        using (MySqlConnection conn = new MySqlConnection(connectionString))
+        // Find the directory that includes the '/src' subpath starting from the current directory
+        string rootDirectoryContainingSrc = DirectoryUtils.FindDirectoryContainingSubpath(Directory.GetCurrentDirectory(), "src");
+
+        using (MySqlDataReader reader = cmd.ExecuteReader())
         {
-            conn.Open();
-            MySqlCommand cmd = new MySqlCommand(query, conn);
-
-            using (MySqlDataReader reader = cmd.ExecuteReader())
+            while (reader.Read())
             {
-                while (reader.Read())
-                {
-                    string imageData = "..\\..\\..\\..\\..\\..\\" + (string)reader["berkas_citra"];
-                    // ..\\..\\..\\..\\..\\..\\
-                    Bitmap bmp = new Bitmap(imageData);
-                    FingerprintOwner Fingerprint = new FingerprintOwner(bmp, imageData, (string)reader["nama"]);
-                    FingerprintOwners.Add(Fingerprint);
-                }
+                // Construct the image path relative to the found directory
+                string imageData = Path.Combine(rootDirectoryContainingSrc, (string)reader["berkas_citra"]);
+                Bitmap bmp = new Bitmap(imageData);
+                FingerprintOwner Fingerprint = new FingerprintOwner(bmp, imageData, (string)reader["nama"]);
+                FingerprintOwners.Add(Fingerprint);
             }
-            conn.Close();
         }
-        return FingerprintOwners;
+        conn.Close();
     }
+    return FingerprintOwners;
+}
+
 
     public List<string> getBiodata(string alayname)
     {
@@ -120,4 +124,28 @@ public class DatabaseManager
     //         Console.WriteLine(name);
     //     }
     // }
+}
+
+
+public class DirectoryUtils
+{
+    public static string FindDirectoryContainingSubpath(string startingPath, string subpathToFind)
+    {
+        DirectoryInfo currentDirectory = new DirectoryInfo(startingPath);
+
+        // Traverse up the directory tree and check each directory
+        while (currentDirectory != null)
+        {
+            // Check if the current directory contains the subpath
+            if (Directory.Exists(Path.Combine(currentDirectory.FullName, subpathToFind)))
+            {
+                return currentDirectory.FullName;
+            }
+
+            // Move to the parent directory
+            currentDirectory = currentDirectory.Parent;
+        }
+
+        throw new InvalidOperationException("No directory containing the specified subpath was found in the directory tree.");
+    }
 }
