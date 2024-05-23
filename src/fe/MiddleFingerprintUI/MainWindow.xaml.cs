@@ -68,17 +68,29 @@ namespace MiddleFingerprintUI
             Stopwatch time = new Stopwatch();
             time.Start();
             imageResult.Source = null;
-;            (FingerprintOwner result, double percentage) = API.SearchFingerprint(inputFingerprint, !_isToggled);
+            (FingerprintOwner result, double percentage) = API.SearchFingerprint(inputFingerprint, !_isToggled);
+            time.Stop();
             if (result.image != null)
             {
                 imageResult.Source = BitmapToImageSource(result.image);
-                Show_Biodata(API.getOwnerBiodata(result.nama));
+                List<string> biodata = (API.getOwnerBiodata(result.nama));
+                // Find the index to insert the new string
+                int index = biodata.FindIndex(info => info.Contains("nama: "));
+                if (index != -1)
+                {
+                    biodata.Insert(index + 1, "nama asli: " + result.nama);
+                }
+                else
+                {
+                    biodata.Add("nama asli: " + result.nama);
+                }
+
+                Show_Biodata(biodata);
             }
             else
             {
                 MessageBox.Show("No match found.");
             }
-            time.Stop();
             Time.Text = $"Processing Time: {time.ElapsedMilliseconds} ms";
             Percentage.Text = $"Similarity: {percentage:0.00}%";
         }
@@ -128,9 +140,12 @@ namespace MiddleFingerprintUI
         private void Show_Biodata(List<string> biodata)
         {
             Info_Biodata.Clear();
-            foreach (string info in biodata)
+            for(int i = 0; i < biodata.Count(); i++)
             {
-                Info_Biodata.AppendText(info + "\n");
+                Info_Biodata.AppendText(biodata[i]);
+                if(i < biodata.Count() - 1){
+                    Info_Biodata.AppendText("\n");
+                }
             }
         }
 
