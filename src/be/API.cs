@@ -32,7 +32,7 @@ public class API
             }
             
             if(databaseAscii.Count != 0){
-                Console.WriteLine(databaseAscii.Count);
+                Console.WriteLine("[DEBUG] Loaded " + databaseAscii.Count +" fingerprints");
             }
             // Search for a match using KMP and Boyer-Moore algorithms
             bool matchFound = false;
@@ -41,7 +41,6 @@ public class API
             {
                 if (KMP.Search(databaseAscii[i], inputAscii) && !isBM)
                 {
-                    Console.WriteLine($"KMP: Match found in fingerprint {i + 1}");
                     matchFound = true;
                     j = i;
                     break;
@@ -49,7 +48,6 @@ public class API
 
                 if (BM.Search(databaseAscii[i], inputAscii) && isBM)
                 {
-                    Console.WriteLine($"BM: Match found in fingerprint {i + 1}");
                     matchFound = true;
                     j = i;
                     break;
@@ -57,12 +55,14 @@ public class API
             }
 
             if(matchFound){
+                string algo = isBM? "BM" : "KMP";
+                Console.WriteLine("[DEBUG] "+ algo+ " match found: "+databaseOwner[j].path);
                 return new Tuple<FingerprintOwner, double>(databaseOwner[j], 100);
             }
 
             if (!matchFound)
             {
-
+                Console.WriteLine("[DEBUG] Starting LD");
                 string newinputAscii = ImageProcessing.ImageToAscii(b, 0, 0, b.Width, b.Height);
                 List<int> dist = new List<int>();
                 foreach (string ascii in databaseAscii)
@@ -73,15 +73,16 @@ public class API
                 double percentage = StringDistance.CalculateSimilarityPercentage(newinputAscii, databaseAscii[x]);
                 if (percentage > 0)
                 {
+                    Console.WriteLine("[DEBUG] LD match found: "+databaseOwner[x].path);
                     return new Tuple<FingerprintOwner, double>(databaseOwner[x], percentage);
                 }
 
 
-                Console.WriteLine("No match found.");
+                Console.WriteLine("[DEBUG] No match found.");
                 return new Tuple<FingerprintOwner, double>(new FingerprintOwner(null, "", ""), percentage);
             }
         } catch (Exception e){
-            Console.WriteLine(e.Message);
+            Console.WriteLine("[DEBUG] "+e.Message);
             return new Tuple<FingerprintOwner, double>(new FingerprintOwner(null, "", ""), 0); ;
         }    
         return new Tuple<FingerprintOwner, double>(new FingerprintOwner(null, "", ""), 0);
