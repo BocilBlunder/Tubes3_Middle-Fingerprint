@@ -11,6 +11,7 @@ using MySql.Data.MySqlClient;
 public class API
 {
    private static DatabaseManager dbController;
+   private static List<string> asciiList = new List<string>();
     public static Tuple<FingerprintOwner, double> SearchFingerprint(Bitmap b, bool isBM)
     {
         dbController = new DatabaseManager("localhost", "tubes3", "root", "");
@@ -23,30 +24,33 @@ public class API
             // Load fingerprint images from the database
             List<FingerprintOwner> databaseOwner = dbController.getImageFromDB();
 
-            // Convert database images to ASCII
-            List<string> databaseAscii = new List<string>();
-            foreach (var owner in databaseOwner)
-            {
-                string ascii = ImageProcessing.ImageToAscii(owner.image, 0, 0, owner.image.Width, owner.image.Height);
-                databaseAscii.Add(ascii);
+            if(asciiList.Count() == 0){
+                // Convert database images to ASCII
+                List<string> databaseAscii = new List<string>();
+                foreach (var owner in databaseOwner)
+                {
+                    string ascii = ImageProcessing.ImageToAscii(owner.image, 0, 0, owner.image.Width, owner.image.Height);
+                    databaseAscii.Add(ascii);
+                }
+                asciiList = databaseAscii;
             }
             
-            if(databaseAscii.Count != 0){
-                Console.WriteLine("[DEBUG] Loaded " + databaseAscii.Count +" fingerprints");
+            if(asciiList.Count != 0){
+                Console.WriteLine("[DEBUG] Loaded " + asciiList.Count +" fingerprints");
             }
             // Search for a match using KMP and Boyer-Moore algorithms
             bool matchFound = false;
             int j = 0;
-            for (int i = 0; i < databaseAscii.Count; i++)
+            for (int i = 0; i < asciiList.Count; i++)
             {
-                if (KMP.Search(databaseAscii[i], inputAscii) && !isBM)
+                if (KMP.Search(asciiList[i], inputAscii) && !isBM)
                 {
                     matchFound = true;
                     j = i;
                     break;
                 }
 
-                if (BM.Search(databaseAscii[i], inputAscii) && isBM)
+                if (BM.Search(asciiList[i], inputAscii) && isBM)
                 {
                     matchFound = true;
                     j = i;
@@ -65,12 +69,12 @@ public class API
                 Console.WriteLine("[DEBUG] Starting LD");
                 string newinputAscii = ImageProcessing.ImageToAscii(b, 0, 0, b.Width, b.Height);
                 List<int> dist = new List<int>();
-                foreach (string ascii in databaseAscii)
+                foreach (string ascii in asciiList)
                 {
                     dist.Add(StringDistance.LevenshteinDistance(ascii, newinputAscii));
                 }
                 int x = dist.IndexOf(dist.Min());
-                double percentage = StringDistance.CalculateSimilarityPercentage(newinputAscii, databaseAscii[x]);
+                double percentage = StringDistance.CalculateSimilarityPercentage(newinputAscii, asciiList[x]);
                 if (percentage > 0)
                 {
                     Console.WriteLine("[DEBUG] LD match found: "+databaseOwner[x].path);
@@ -90,7 +94,7 @@ public class API
 
 
     public static void Main(string[] args){
-        dbController = new DatabaseManager("localhost", "tubes3", "root", "root");
+        dbController = new DatabaseManager("localhost", "tubes3", "root", "");
         try{
             // Load input fingerprint image
             Bitmap inputFingerprint = new Bitmap("..\\..\\test\\1__M_Left_index_finger.BMP");
