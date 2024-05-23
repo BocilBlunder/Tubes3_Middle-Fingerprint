@@ -10,8 +10,22 @@ using MySql.Data.MySqlClient;
 
 public class API
 {
-   private static DatabaseManager dbController;
-   private static List<string> asciiList = new List<string>();
+    private static DatabaseManager dbController;
+    private static List<string> asciiList = new List<string>();
+
+    public static void getCache()
+    {
+        dbController = new DatabaseManager("localhost", "tubes3", "root", "");
+        List<FingerprintOwner> databaseOwner = dbController.getImageFromDB();
+        List<string> databaseAscii = new List<string>();
+        foreach (var owner in databaseOwner)
+        {
+            string ascii = ImageProcessing.ImageToAscii(owner.image, 0, 0, owner.image.Width, owner.image.Height);
+            databaseAscii.Add(ascii);
+        }
+        asciiList = databaseAscii;
+    }
+    
     public static Tuple<FingerprintOwner, double> SearchFingerprint(Bitmap b, bool isBM)
     {
         dbController = new DatabaseManager("localhost", "tubes3", "root", "");
@@ -23,20 +37,11 @@ public class API
             string inputAscii = ImageProcessing.ReadBestPixelFromImage(inputFingerprint, 64);
             // Load fingerprint images from the database
             List<FingerprintOwner> databaseOwner = dbController.getImageFromDB();
+            List<string> databaseAscii = asciiList;
 
-            if(asciiList.Count() == 0){
-                // Convert database images to ASCII
-                List<string> databaseAscii = new List<string>();
-                foreach (var owner in databaseOwner)
-                {
-                    string ascii = ImageProcessing.ImageToAscii(owner.image, 0, 0, owner.image.Width, owner.image.Height);
-                    databaseAscii.Add(ascii);
-                }
-                asciiList = databaseAscii;
-            }
-            
-            if(asciiList.Count != 0){
-                Console.WriteLine("[DEBUG] Loaded " + asciiList.Count +" fingerprints");
+            if (asciiList.Count != 0)
+            {
+                Console.WriteLine("[DEBUG] Loaded " + asciiList.Count + " fingerprints");
             }
             // Search for a match using KMP and Boyer-Moore algorithms
             bool matchFound = false;
@@ -58,9 +63,10 @@ public class API
                 }
             }
 
-            if(matchFound){
-                string algo = isBM? "BM" : "KMP";
-                Console.WriteLine("[DEBUG] "+ algo+ " match found: "+databaseOwner[j].path);
+            if (matchFound)
+            {
+                string algo = isBM ? "BM" : "KMP";
+                Console.WriteLine("[DEBUG] " + algo + " match found: " + databaseOwner[j].path);
                 return new Tuple<FingerprintOwner, double>(databaseOwner[j], 100);
             }
 
@@ -77,7 +83,7 @@ public class API
                 double percentage = StringDistance.CalculateSimilarityPercentage(newinputAscii, asciiList[x]);
                 if (percentage > 0)
                 {
-                    Console.WriteLine("[DEBUG] LD match found: "+databaseOwner[x].path);
+                    Console.WriteLine("[DEBUG] LD match found: " + databaseOwner[x].path);
                     return new Tuple<FingerprintOwner, double>(databaseOwner[x], percentage);
                 }
 
@@ -85,17 +91,21 @@ public class API
                 Console.WriteLine("[DEBUG] No match found.");
                 return new Tuple<FingerprintOwner, double>(new FingerprintOwner(null, "", ""), percentage);
             }
-        } catch (Exception e){
-            Console.WriteLine("[DEBUG] "+e.Message);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("[DEBUG] " + e.Message);
             return new Tuple<FingerprintOwner, double>(new FingerprintOwner(null, "", ""), 0); ;
-        }    
+        }
         return new Tuple<FingerprintOwner, double>(new FingerprintOwner(null, "", ""), 0);
     }
 
 
-    public static void Main(string[] args){
+    public static void Main(string[] args)
+    {
         dbController = new DatabaseManager("localhost", "tubes3", "root", "");
-        try{
+        try
+        {
             // Load input fingerprint image
             Bitmap inputFingerprint = new Bitmap("..\\..\\test\\1__M_Left_index_finger.BMP");
             Console.WriteLine("TES");
@@ -112,8 +122,9 @@ public class API
                 string ascii = ImageProcessing.ImageToAscii(owner.image, 0, 0, owner.image.Width, owner.image.Height);
                 databaseAscii.Add(ascii);
             }
-            
-            if(databaseAscii.Count != 0){
+
+            if (databaseAscii.Count != 0)
+            {
                 Console.WriteLine(databaseAscii.Count);
             }
 
@@ -137,7 +148,8 @@ public class API
                 }
             }
 
-            if(matchFound){
+            if (matchFound)
+            {
                 Console.WriteLine(databaseOwner[j].nama);
             }
 
@@ -145,16 +157,21 @@ public class API
             {
                 Console.WriteLine("No match found.");
             }
-        } catch (Exception e){
+        }
+        catch (Exception e)
+        {
             Console.WriteLine(e.Message);
-        }    
+        }
     }
 
-    public static List<string> getOwnerBiodata (string name){
+    public static List<string> getOwnerBiodata(string name)
+    {
         List<string> alayname = dbController.getAllAlayNames();
         string finalName;
-        foreach (string nama in alayname){
-            if (RegexChecker.IsValidWord(name, nama)){
+        foreach (string nama in alayname)
+        {
+            if (RegexChecker.IsValidWord(name, nama))
+            {
                 finalName = nama;
                 return dbController.getBiodata(finalName);
             }
@@ -167,8 +184,8 @@ public class API
         }
 
         int i = dist.IndexOf(dist.Min());
-        double percentage =  StringDistance.CalculateSimilarityPercentage(name, alayname[i]);
-        if(percentage > 0)
+        double percentage = StringDistance.CalculateSimilarityPercentage(name, alayname[i]);
+        if (percentage > 0)
         {
             finalName = alayname[i];
             return dbController.getBiodata(finalName);

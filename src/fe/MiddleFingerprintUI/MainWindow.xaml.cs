@@ -25,6 +25,7 @@ namespace MiddleFingerprintUI
         public MainWindow()
         {
             InitializeComponent();
+            API.getCache();
             this.WindowStyle = WindowStyle.None; // Remove window border and title bar
             this.ResizeMode = ResizeMode.NoResize; // Disable resizing
             this.WindowStartupLocation = WindowStartupLocation.CenterScreen; // Open window in the center of the screen
