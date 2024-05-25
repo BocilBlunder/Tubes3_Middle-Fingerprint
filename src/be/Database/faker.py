@@ -1,5 +1,5 @@
 import mysql.connector
-from faker import Faker
+from be.Database.faker import Faker
 import random
 import os
 
