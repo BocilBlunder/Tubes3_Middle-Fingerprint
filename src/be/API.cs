@@ -15,7 +15,7 @@ public class API
 
     public static void getCache()
     {
-        dbController = new DatabaseManager("localhost", "tubes3", "root", "");
+        dbController = new DatabaseManager("localhost", "tubes3", "root", "pass");
         List<FingerprintOwner> databaseOwner = dbController.getImageFromDB();
         List<string> databaseAscii = new List<string>();
         foreach (var owner in databaseOwner)
@@ -28,13 +28,13 @@ public class API
     
     public static Tuple<FingerprintOwner, double> SearchFingerprint(Bitmap b, bool isBM)
     {
-        dbController = new DatabaseManager("localhost", "tubes3", "root", "");
+        dbController = new DatabaseManager("localhost", "tubes3", "root", "pass");
         try
         {
             // Load input fingerprint image
             Bitmap inputFingerprint = b;
             // Segment the input image to ASCII
-            string inputAscii = ImageProcessing.ReadBestPixelFromImage(inputFingerprint, 64);
+            List<string> inputAscii = ImageProcessing.ReadBestPixelFromImage(inputFingerprint, 64);
             // Load fingerprint images from the database
             List<FingerprintOwner> databaseOwner = dbController.getImageFromDB();
             List<string> databaseAscii = asciiList;
@@ -43,58 +43,58 @@ public class API
             {
                 Console.WriteLine("[DEBUG] Loaded " + asciiList.Count + " fingerprints");
             }
-            // Search for a match using KMP and Boyer-Moore algorithms
-            bool matchFound = false;
-            int j = 0;
-            for (int i = 0; i < asciiList.Count; i++)
+            foreach (string bestInputAscii in inputAscii)
             {
-                if (KMP.Search(asciiList[i], inputAscii) && !isBM)
+                // Search for a match using KMP and Boyer-Moore algorithms
+                bool matchFound = false;
+                int j = 0;
+                for (int i = 0; i < asciiList.Count; i++)
                 {
-                    matchFound = true;
-                    j = i;
-                    break;
+                    if (KMP.Search(asciiList[i], bestInputAscii) && !isBM)
+                    {
+                        matchFound = true;
+                        j = i;
+                        break;
+                    }
+
+                    if (BM.Search(asciiList[i], bestInputAscii) && isBM)
+                    {
+                        matchFound = true;
+                        j = i;
+                        break;
+                    }
                 }
 
-                if (BM.Search(asciiList[i], inputAscii) && isBM)
+                if (matchFound)
                 {
-                    matchFound = true;
-                    j = i;
-                    break;
+                    string algo = isBM ? "BM" : "KMP";
+                    Console.WriteLine("[DEBUG] " + algo + " match found: " + databaseOwner[j].path);
+                    return new Tuple<FingerprintOwner, double>(databaseOwner[j], 100);
                 }
             }
-
-            if (matchFound)
+            Console.WriteLine("[DEBUG] Starting LD");
+            string newinputAscii = ImageProcessing.ImageToAscii(b, 0, 0, b.Width, b.Height);
+            List<int> dist = new List<int>();
+            foreach (string ascii in asciiList)
             {
-                string algo = isBM ? "BM" : "KMP";
-                Console.WriteLine("[DEBUG] " + algo + " match found: " + databaseOwner[j].path);
-                return new Tuple<FingerprintOwner, double>(databaseOwner[j], 100);
+                dist.Add(StringDistance.LevenshteinDistance(ascii, newinputAscii));
+            }
+            int x = dist.IndexOf(dist.Min());
+            double percentage = StringDistance.CalculateSimilarityPercentage(newinputAscii, asciiList[x]);
+            if (percentage > 0)
+            {
+                Console.WriteLine("[DEBUG] LD match found: " + databaseOwner[x].path);
+                return new Tuple<FingerprintOwner, double>(databaseOwner[x], percentage);
             }
 
-            if (!matchFound)
-            {
-                Console.WriteLine("[DEBUG] Starting LD");
-                string newinputAscii = ImageProcessing.ImageToAscii(b, 0, 0, b.Width, b.Height);
-                List<int> dist = new List<int>();
-                foreach (string ascii in asciiList)
-                {
-                    dist.Add(StringDistance.LevenshteinDistance(ascii, newinputAscii));
-                }
-                int x = dist.IndexOf(dist.Min());
-                double percentage = StringDistance.CalculateSimilarityPercentage(newinputAscii, asciiList[x]);
-                if (percentage > 0)
-                {
-                    Console.WriteLine("[DEBUG] LD match found: " + databaseOwner[x].path);
-                    return new Tuple<FingerprintOwner, double>(databaseOwner[x], percentage);
-                }
 
-
-                Console.WriteLine("[DEBUG] No match found.");
-                return new Tuple<FingerprintOwner, double>(new FingerprintOwner(null, "", ""), percentage);
-            }
+            Console.WriteLine("[DEBUG] No match found.");
+            return new Tuple<FingerprintOwner, double>(new FingerprintOwner(null, "", ""), percentage);
+            
         }
         catch (Exception e)
         {
-            Console.WriteLine("[DEBUG] " + e.Message);
+            Console.WriteLine("[DEBUG C# error] " + e.Message);
             return new Tuple<FingerprintOwner, double>(new FingerprintOwner(null, "", ""), 0); ;
         }
         return new Tuple<FingerprintOwner, double>(new FingerprintOwner(null, "", ""), 0);
@@ -103,7 +103,7 @@ public class API
 
     public static void Main(string[] args)
     {
-        dbController = new DatabaseManager("localhost", "tubes3", "root", "");
+        dbController = new DatabaseManager("localhost", "tubes3", "root", "pass");
         try
         {
             // Load input fingerprint image

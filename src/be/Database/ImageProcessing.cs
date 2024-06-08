@@ -59,7 +59,7 @@ public class ImageProcessing {
         return transitions;
     }
     
-    public static string FindBestPixel(string binaryString, int blockSize)
+    public static string FindMaxTransitionsPixels(string binaryString, int blockSize)
     {
         int maxTransitionCount = 0;
         string bestSubstring = binaryString.Substring(0, Math.Min(blockSize, binaryString.Length));
@@ -77,10 +77,61 @@ public class ImageProcessing {
         return bestSubstring;
     }
 
-    // Fungsi utama untuk memproses gambar dan mengekstrak blok terbaik
-    public static string ReadBestPixelFromImage(Bitmap bmp, int blockSize)
+    public static List<string> FindOptimalTransitionsRatioPixels(string binaryString, int blockSize, double threshold)
     {
+        List<string> result = new List<string>();
+
+        for (int i = 0; i < binaryString.Length - blockSize; i += 1)
+        {
+            string substring = binaryString.Substring(i, blockSize);
+            int transitionCount = CountTransitions(substring);
+            if ((double)transitionCount / blockSize > threshold)
+            {
+                result.Add(substring);
+            }
+        }
+        return result;
+    }
+
+    // Fungsi utama untuk memproses gambar dan mengekstrak blok terbaik
+    public static List<string> ReadBestPixelFromImage(Bitmap bmp, int blockSize)
+    {
+        List<string> bestPixelStrings = new List<string>();
         string binaryString = ImageToBinary(bmp, 0, 0, bmp.Width, bmp.Height);
-        return BinaryToAscii(FindBestPixel(binaryString, blockSize));
+
+
+        // Strategi 1. Memilih string dengan transisi terbesar
+        bestPixelStrings.Add(BinaryToAscii(FindMaxTransitionsPixels(binaryString, blockSize)));
+
+
+        // Strategi 2.
+        // Memilih string-string dengan rasio transisi > 20%
+        List<string> bestPixelsBinary = FindOptimalTransitionsRatioPixels(binaryString, blockSize, 0.20);
+        foreach (string bestPixels in bestPixelsBinary)
+        {
+            bestPixelStrings.Add(BinaryToAscii(bestPixels));
+        }
+
+
+        // String-stringnya dishuffle sehingga tidak ada bias dalam pemilihan pattern yang digunakan
+        // sehingga proses pencarian jadi lebih cepat
+        Shuffle(ref bestPixelStrings);
+
+        Console.WriteLine("Returning the patterns");
+        return bestPixelStrings;
+    }
+
+    public static void Shuffle(ref List<string> list)
+    {
+        if (list.Count <= 1) return;
+
+        Random random = new Random();
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = random.Next(i + 1);
+            string temp = list[i];
+            list[i] = list[j];
+            list[j] = temp;
+        }
     }
 }
