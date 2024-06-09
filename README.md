@@ -30,7 +30,7 @@ This program is designed for biometric identification through fingerprint analys
     git clone https://github.com/BocilBlunder/Tubes3_Middle-Fingerprint.git
     ```
 
-2. Create the local database using sql file in folder Database
+2. Create the local database using sql file in folder src/be/Database
 
 3. Change the server, name, user, and password for dbController in API.cs
 

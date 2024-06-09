@@ -40,7 +40,6 @@ public class DatabaseManager
                     // Assuming the 'nama' column is stored in encrypted byte array form
                     byte[] encryptedName = (byte[])reader["nama"];
                     string decryptedName = decrypt(encryptedName);
-                    Console.WriteLine(decryptedName);
                     alayNames.Add(decryptedName);
                 }
             }
