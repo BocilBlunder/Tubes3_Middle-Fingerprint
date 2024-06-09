@@ -2,9 +2,16 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Text;
+using Tubes3_Middle_Fingerprint.Database;
 
 public class DatabaseManager
 {
+
+    byte[] key = new byte[32] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 };
+    byte[] nonce = new byte[8] { 0, 1, 2, 3, 4, 5, 6, 7 };
+
+
     private string connectionString;
 
     public DatabaseManager(string server, string database, string userId, string password)
@@ -105,7 +112,17 @@ public List<FingerprintOwner> getImageFromDB()
                 {
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        biodata.Add(reader.GetName(i) + ": " + reader[i].ToString());
+                        if (reader.GetName(i).Equals("NIK"))
+                        {
+                            byte[] buffer = Encoding.UTF8.GetBytes(reader[i].ToString());
+                            Salsa20.s20_crypt(key, nonce, 0, buffer);
+
+                            biodata.Add(reader.GetName(i) + ": " + Encoding.UTF8.GetString(buffer));
+                        }
+                        else
+                        {
+                            biodata.Add(reader.GetName(i) + ": " + reader[i].ToString());
+                        }
                     }
                 }
             }
