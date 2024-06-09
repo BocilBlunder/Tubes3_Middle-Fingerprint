@@ -16,7 +16,7 @@
 - [Algorithm Description](#Algorithm-Description)
 - [How To Run](#How-to-Run)
 - [How To Use](#How-To-Use)
-- [Programming Language](#Programming-Language)
+- [Prerequisites](Prerequisites)
 - [Link](#link)
 
 ## General-Info
@@ -60,9 +60,10 @@ This program is designed for biometric identification through fingerprint analys
 3. Select the algorithm you want to use and press search button.
 4. Press info button to see the owner biodata of the fingerprint.
 
-## Programming-Language
+## Prerequisites
 
 1. C# (C Sharp)
+2. Dotnet version 8
 2. SQL (MYSQL)
 
 ## Link
