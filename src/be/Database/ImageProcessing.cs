@@ -106,7 +106,7 @@ public class ImageProcessing {
 
         // Strategi 2.
         // Memilih string-string dengan rasio transisi > 20%
-        List<string> bestPixelsBinary = FindOptimalTransitionsRatioPixels(binaryString, blockSize, 0.15);
+        List<string> bestPixelsBinary = FindOptimalTransitionsRatioPixels(binaryString, blockSize, 0.20);
         foreach (string bestPixels in bestPixelsBinary)
         {
             bestPixelStrings.Add(BinaryToAscii(bestPixels));
