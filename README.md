@@ -30,20 +30,24 @@ This program is designed for biometric identification through fingerprint analys
     git clone https://github.com/BocilBlunder/Tubes3_Middle-Fingerprint.git
     ```
 
-2.  Navigate to the directory:
+2. Create the local database using sql file in folder Database
+
+3. Change the server, name, user, and password for dbController in API.cs
+
+4.  Navigate to the directory:
 
     ```bash
     cd Tubes3_Middle-Fingerprint/src/fe/MiddleFingerprintUI
     ```
 
-3. Run the program:
+5. Run the program:
     ```bash
     dotnet run
     ```
 
 ## How-To-Use
 
-1. Type "dotnet run" to launch the GUI screen.
+1. Type "dotnet run" in terminal to launch the GUI screen.
 2. Press upload image button to upload a file in format jpg, jpeg, png, bmp.
 3. Select the algorithm you want to use and press search button.
 4. Press info button to see the owner biodata of the fingerprint.
@@ -56,4 +60,4 @@ This program is designed for biometric identification through fingerprint analys
 ## Link
 
 - Repository : https://github.com/BocilBlunder/Tubes3_Middle-Fingerprint
-- Video :
+- Video : https://youtu.be/csvWkI7znQ0?si=3VnyoNE92doZEcZ1
