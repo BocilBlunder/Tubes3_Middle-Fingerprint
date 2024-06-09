@@ -16,7 +16,7 @@
 - [Algorithm Description](#Algorithm-Description)
 - [How To Run](#How-to-Run)
 - [How To Use](#How-To-Use)
-- [Prerequisites](Prerequisites)
+- [Prerequisites](#Prerequisites)
 - [Link](#link)
 
 ## General-Info
