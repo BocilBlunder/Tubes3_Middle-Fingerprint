@@ -15,7 +15,7 @@ public class API
 
     public static void getCache()
     {
-        dbController = new DatabaseManager("localhost", "tubes3", "root", "pass");
+        dbController = new DatabaseManager("localhost", "tubes3", "root", "root");
         //dbController.encryptDB("select * from biodata");
         List<FingerprintOwner> databaseOwner = dbController.getImageFromDB();
         List<string> databaseAscii = new List<string>();
@@ -29,7 +29,7 @@ public class API
     
     public static Tuple<FingerprintOwner, double> SearchFingerprint(Bitmap b, bool isBM)
     {
-        dbController = new DatabaseManager("localhost", "tubes3", "root", "pass");
+        dbController = new DatabaseManager("localhost", "tubes3", "root", "root");
         try
         {
             // Load input fingerprint image
@@ -104,7 +104,7 @@ public class API
 
     public static void Main(string[] args)
     {
-        dbController = new DatabaseManager("localhost", "tubes3", "root", "pass");
+        dbController = new DatabaseManager("localhost", "tubes3", "root", "root");
         try
         {
             // Load input fingerprint image

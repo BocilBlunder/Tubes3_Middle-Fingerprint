@@ -25,23 +25,28 @@ public class DatabaseManager
 
     public List<string> getAllAlayNames()
     {
-        List<string> alayname = new List<string>();
-        string query = "SELECT nama FROM biodata";
+        List<string> alayNames = new List<string>();
+        string query = "SELECT nama FROM encryptedbiodata";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
         {
             conn.Open();
             MySqlCommand cmd = new MySqlCommand(query, conn);
+
             using (MySqlDataReader reader = cmd.ExecuteReader())
             {
                 while (reader.Read())
                 {
-                    alayname.Add(reader["nama"].ToString());
+                    // Assuming the 'nama' column is stored in encrypted byte array form
+                    byte[] encryptedName = (byte[])reader["nama"];
+                    string decryptedName = decrypt(encryptedName);
+                    Console.WriteLine(decryptedName);
+                    alayNames.Add(decryptedName);
                 }
             }
             conn.Close();
         }
-        return alayname;
+        return alayNames;
     }
 
     public List<string> getOrisinilNames(string imagePath)
