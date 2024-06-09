@@ -16,6 +16,7 @@ public class API
     public static void getCache()
     {
         dbController = new DatabaseManager("localhost", "tubes3", "root", "pass");
+        //dbController.encryptDB("select * from biodata");
         List<FingerprintOwner> databaseOwner = dbController.getImageFromDB();
         List<string> databaseAscii = new List<string>();
         foreach (var owner in databaseOwner)

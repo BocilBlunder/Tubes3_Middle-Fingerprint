@@ -2,8 +2,12 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Reflection.PortableExecutable;
+using System.Reflection;
 using System.Text;
 using Tubes3_Middle_Fingerprint.Database;
+using System.Configuration;
+using ZstdSharp.Unsafe;
 
 public class DatabaseManager
 {
@@ -97,14 +101,14 @@ public List<FingerprintOwner> getImageFromDB()
     public List<string> getBiodata(string alayname)
     {
         List<string> biodata = new List<string>();
-        string query = "SELECT * FROM biodata WHERE nama = @Name";
+        string query = "SELECT * FROM encryptedbiodata WHERE nama = @Name";
 
         using (MySqlConnection conn = new MySqlConnection(connectionString))
         {
             conn.Open(); 
 
             MySqlCommand cmd = new MySqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@Name", alayname);
+            cmd.Parameters.AddWithValue("@Name", encrypt(alayname));
 
             using (MySqlDataReader reader = cmd.ExecuteReader())
             {
@@ -112,12 +116,16 @@ public List<FingerprintOwner> getImageFromDB()
                 {
                     for (int i = 0; i < reader.FieldCount; i++)
                     {
-                        if (reader.GetName(i).Equals("NIK"))
+                        if (reader.GetName(i).Equals("NIK")||
+                            reader.GetName(i).Equals("nama") ||
+                            reader.GetName(i).Equals("tempat_lahir") ||
+                            reader.GetName(i).Equals("golongan_darah") ||
+                            reader.GetName(i).Equals("alamat") ||
+                            reader.GetName(i).Equals("agama") ||
+                            reader.GetName(i).Equals("pekerjaan") ||
+                            reader.GetName(i).Equals("kewarganegaraan"))
                         {
-                            byte[] buffer = Encoding.UTF8.GetBytes(reader[i].ToString());
-                            Salsa20.s20_crypt(key, nonce, 0, buffer);
-
-                            biodata.Add(reader.GetName(i) + ": " + Encoding.UTF8.GetString(buffer));
+                            biodata.Add(reader.GetName(i) + ": " + decrypt((byte[])reader[i]));
                         }
                         else
                         {
@@ -129,6 +137,83 @@ public List<FingerprintOwner> getImageFromDB()
             conn.Close();
         }
         return biodata;
+    }
+    private byte[] encrypt(string value)
+    {
+        byte[] unecryptedByte = Encoding.UTF8.GetBytes(value);
+        Salsa20.s20_crypt(key, nonce, 0, unecryptedByte);
+        return unecryptedByte;
+    }
+
+    private string decrypt(byte[] value)
+    {
+        Salsa20.s20_crypt(key, nonce, 0, value);
+        return Encoding.UTF8.GetString(value);
+    }
+
+    public void encryptDB(string query)
+    {
+
+        List<byte[][]> listOfStringArrays = new List<byte[][]>();
+
+
+        using (MySqlConnection connection = new MySqlConnection(connectionString))
+        {
+            try
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(query, connection);
+                using (MySqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        byte[][] stringArray = new byte[][] {
+                            encrypt(reader[0].ToString()),
+                            encrypt(reader[1].ToString()),
+                            encrypt(reader[2].ToString()),
+                            Encoding.UTF8.GetBytes(reader[3].ToString()),
+                            Encoding.UTF8.GetBytes(reader[4].ToString()),
+                            encrypt(reader[5].ToString()),
+                            encrypt(reader[6].ToString()),
+                            encrypt(reader[7].ToString()),
+                            Encoding.UTF8.GetBytes(reader[8].ToString()),
+                            encrypt(reader[9].ToString()),
+                            encrypt(reader[10].ToString())
+                        };
+                        listOfStringArrays.Add(stringArray);
+                    }
+                    
+                    
+                }
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine("Error connecting to MySQL database:", ex.Message);
+            }
+        }
+        using (MySqlConnection conn2 = new MySqlConnection(connectionString))
+        {
+            conn2.Open();
+            foreach (byte[][] arr in listOfStringArrays)
+            {
+                string insertQuery = "insert into encryptedbiodata values (@NIK, @NAMA, @TEMPAT_LAHIR, STR_TO_DATE(@TANGGAL_LAHIR, '%m/%d/%Y %h:%i:%s %p'), @JENIS_KELAMIN, @GOLONGAN_DARAH, @ALAMAT, @AGAMA, @STATUSKWN, @JOB, @KWN)";
+                MySqlCommand cmd2 = new MySqlCommand(insertQuery, conn2);
+
+                cmd2.Parameters.AddWithValue("@NIK", arr[0]);
+                cmd2.Parameters.AddWithValue("@NAMA", arr[1]);
+                cmd2.Parameters.AddWithValue("@TEMPAT_LAHIR", arr[2]);
+                cmd2.Parameters.AddWithValue("@TANGGAL_LAHIR", arr[3]);
+                cmd2.Parameters.AddWithValue("@JENIS_KELAMIN", arr[4]);
+                cmd2.Parameters.AddWithValue("@GOLONGAN_DARAH", arr[5]);
+                cmd2.Parameters.AddWithValue("@ALAMAT", arr[6]);
+                cmd2.Parameters.AddWithValue("@AGAMA", arr[7]);
+                cmd2.Parameters.AddWithValue("@STATUSKWN", arr[8]);
+                cmd2.Parameters.AddWithValue("@JOB", arr[9]);
+                cmd2.Parameters.AddWithValue("@KWN", arr[10]);
+
+                cmd2.ExecuteNonQuery();
+            }
+        }
     }
 
     // static void Main(string[] args)
